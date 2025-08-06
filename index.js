@@ -6,7 +6,10 @@ const config = require('./config');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://time-table-tracker.netlify.app', // your Netlify frontend URL
+  credentials: true
+}));
 app.use(express.json());
 
 // In-memory storage for fallback
