@@ -6,10 +6,16 @@ const config = require('./config');
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'https://time-table-tracker.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
 app.use(cors({
-  origin: 'https://time-table-tracker.netlify.app', // your Netlify frontend URL
+  origin: allowedOrigins,
   credentials: true
 }));
+// app.use(cors());
 app.use(express.json());
 
 // In-memory storage for fallback
