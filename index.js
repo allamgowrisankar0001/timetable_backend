@@ -20,10 +20,12 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB successfully!');
+    console.log('📊 Database URL:', config.MONGODB_URI);
     return true;
   } catch (error) {
-    console.log('MongoDB not available, using in-memory storage');
+    console.error('❌ MongoDB connection failed:', error.message);
+    console.log('⚠️  Using in-memory storage as fallback');
     return false;
   }
 };
@@ -43,11 +45,38 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Server is running',
-    database: dbConnected ? 'MongoDB' : 'In-Memory'
+    database: dbConnected ? 'MongoDB' : 'In-Memory',
+    timestamp: new Date().toISOString()
   });
 });
 
+// Test MongoDB connection endpoint
+app.get('/api/test-db', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      res.json({ 
+        status: 'Connected', 
+        message: 'MongoDB is connected and working',
+        readyState: mongoose.connection.readyState
+      });
+    } else {
+      res.json({ 
+        status: 'Disconnected', 
+        message: 'MongoDB is not connected',
+        readyState: mongoose.connection.readyState
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'Error', 
+      message: error.message 
+    });
+  }
+});
+
 app.listen(config.PORT, () => {
-  console.log(`Server running on port ${config.PORT}`);
-  console.log(`Database: ${dbConnected ? 'MongoDB' : 'In-Memory Storage'}`);
+  console.log(`🚀 Server running on port ${config.PORT}`);
+  console.log(`📊 Database: ${dbConnected ? 'MongoDB' : 'In-Memory Storage'}`);
+  console.log(`🌐 Health check: http://localhost:${config.PORT}/api/health`);
+  console.log(`🔍 Test DB: http://localhost:${config.PORT}/api/test-db`);
 }); 
